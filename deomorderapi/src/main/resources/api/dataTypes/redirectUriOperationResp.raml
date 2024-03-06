@@ -1,0 +1,11 @@
+#%RAML 1.0 DataType
+properties:
+  success:
+    type: boolean
+    example: true
+  message:
+    type: string
+    enum:
+      - Callback URI started successfully.
+      - Callback URI stopped successfully.
+    example: "Callback URI started successfully."

@@ -1,0 +1,149 @@
+#%RAML 1.0
+title: abc-sys-api
+
+version: v1
+
+baseUri: http://{baseURL}.us-e2.cloudhub.io/
+
+baseUriParameters:
+  baseURL:
+    description: Use the below baseURL's for each specific env. 
+    enum:
+      - abc-app-dev
+      - abc-app-stg
+      - abc-app-prd
+
+mediaType:
+  - application/json
+
+protocols:
+  - HTTP
+
+traits:
+  commonErrorTrait: !include traits/commonErrorTrait.raml
+  commonAcceptTrait: !include traits/commonAcceptTrait.raml
+  commonAuthorizationTrait: !include traits/commonAuthorizationTrait.raml
+  commonContentTypeTrait: !include traits/commonContentTypeTrait.raml
+
+types:
+  getTokenResp: !include dataTypes/getTokenResp.raml
+  redirectUriOpsResp: !include dataTypes/redirectUriOperationResp.raml
+  OrderType: !include dataTypes/OrderType.raml
+
+/v1:
+  /ping:
+    description: To check if the API is up and running
+    get:
+      is: [commonAuthorizationTrait,commonErrorTrait]    
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/pingResponse.raml
+  
+  /callback:
+    description: To check how to implement queryParameter
+    get:
+      is: [commonAuthorizationTrait,commonErrorTrait] 
+      queryParameters:
+        code:
+          displayName: code
+          type: string
+          required: true
+          example: "37c227f6-xxxx-xxxx-xxxx-a2b77aa46fbe"
+        state:
+          displayName: state
+          description: Will be used to denote an acronym for the client.
+          type: string
+          required: true
+          example: "c1"
+        loadType:
+          displayName: loadType
+          type: 
+            enum:
+              - on-demand
+          required: true
+          example: "on-demand" 
+      responses:
+        201:
+          body:
+            application/json:
+              type: getTokenResp
+
+    /{operation}:
+      uriParameters:
+        operation:
+          type: string
+          enum:
+            - start
+            - stop
+            - status        
+      get:
+        is: [commonAuthorizationTrait,commonErrorTrait]    
+        responses:
+          200:
+            body:
+              application/json:
+                type: redirectUriOpsResp
+
+  /orders:
+    post:
+      is: [commonAuthorizationTrait,commonErrorTrait]
+      description: To Create Orders
+      body:
+        application/json:
+          type: OrderType
+          example: !include examples/OrderExampleNoID.raml
+      responses:
+        201:
+          body:
+            application/json:
+              examples:
+                message: Order Created
+    get:
+      is: [commonAuthorizationTrait,commonErrorTrait]
+      description: To get all orders
+      responses:
+        200:
+          body:
+            application/json:
+              type: OrderType[]
+              examples: !include examples/OrdersExample.raml
+    /{ID}:
+      get:
+        is: [commonAuthorizationTrait,commonErrorTrait]
+        description: To get order by ID
+        responses:
+          200: 
+            body:
+              application/json:
+                type: OrderType
+                example: !include examples/OrderExample.raml
+      
+      delete:
+        is: [commonAuthorizationTrait,commonErrorTrait]
+        description: To Delete Order by ID
+        responses:
+          200:
+            body: 
+              application/json:
+                examples:
+                  message: Order Deleted         
+
+      put:
+        is: [commonAuthorizationTrait,commonErrorTrait]
+        description: To Update Order by ID
+        body:
+          application/json:
+            type: OrderType
+            examples: !include examples/OrderExample.raml
+        responses:
+          200:
+            body: 
+              application/json:
+                examples:
+                  message: Order Updated
+
+
+
+
