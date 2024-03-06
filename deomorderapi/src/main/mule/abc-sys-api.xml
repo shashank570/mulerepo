@@ -55,7 +55,7 @@ output application/json
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-"Order Updated" as String {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+"Order is Updated" as String {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
